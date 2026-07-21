@@ -1,0 +1,40 @@
+# CCS build output
+Debug/
+Release/
+
+# Generated compiler and linker artifacts
+*.o
+*.obj
+*.d
+*.out
+*.map
+*.hex
+*.bin
+*.elf
+*_linkInfo.xml
+
+# Local IDE and editor state
+.settings/
+.metadata/
+.clangd
+.vscode/
+.idea/
+*.launch
+
+# Temporary files and local reference material
+tmp/
+*.tmp
+*.bak
+*.swp
+*~
+
+# Drivers and generated notes not used by the current CCS build
+Drivers/OLED_Hardware_I2C/
+Drivers/Ultrasonic_Capture/
+Drivers/Ultrasonic_GPIO/
+targetConfigs/readme.txt
+
+# Operating-system metadata
+.DS_Store
+Thumbs.db
+desktop.ini
