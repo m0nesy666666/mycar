@@ -55,6 +55,7 @@ int main(void)
     int pwm3;
     int pwm4;
     int PWM45;
+    int32_t COUNT;
     OLED_ShowString(0,7,(uint8_t *)"BNO08X Demo",8);
     OLED_ShowString(0,1,(uint8_t *)"BNO08X Demo",8);
 
