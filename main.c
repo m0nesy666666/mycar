@@ -54,6 +54,7 @@ int main(void)
     int PWM1;
     int PWM2;
     int pwm3;
+    int pwm4;
     OLED_ShowString(0,7,(uint8_t *)"BNO08X Demo",8);
     OLED_ShowString(0,1,(uint8_t *)"BNO08X Demo",8);
     PWM1=Calculate_target(30);
