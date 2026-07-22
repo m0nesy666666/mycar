@@ -5,7 +5,6 @@
 #include "motor.h"
 #include "Serial.h"
 #include <stdio.h>
-#include "stepmotor.h"
 PID_t speed_pid;
 
 uint8_t oled_buffer[32];
@@ -58,12 +57,11 @@ int main(void)
     int PWM45;
     OLED_ShowString(0,7,(uint8_t *)"BNO08X Demo",8);
     OLED_ShowString(0,1,(uint8_t *)"BNO08X Demo",8);
-    PWM1=Calculate_target(30);
 
-    PWM2=Calculate_target(15);
-    Set_PWM(PWM1,PWM2);
-    Motor_SetPWM(0,80);
-    Motor_SetPWM(1,80);
+    // PWM2=Calculate_target(15);
+    // Set_PWM(PWM1,PWM2);
+    // Motor_SetPWM(0,80);
+    // Motor_SetPWM(1,80);
     
     
     
