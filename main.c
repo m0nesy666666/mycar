@@ -5,22 +5,21 @@
 #include "motor.h"
 #include "Serial.h"
 #include <stdio.h>
-PID_t speed_pid;
-
+PID_t speed_pid_A;
+PID_t speed_pid_B;
+PID_t speed_pid_C;
+PID_t speed_pid_D;
+#define SPEED_KP  8.0f
+#define SPEED_KI  0.5f
 uint8_t oled_buffer[32];
 int status = 0;
-float sudu=0;
-float target =0.5;
-int8_t out;
-int8_t count;
-/* 目标速度，单位m/s */
-volatile float target_speed = 0.5f;
 
-/* 四个电机的平均实际速度，单位m/s */
-volatile float average_speed = 0.0f;
+volatile float target_speed_A = 0.3f;
+volatile float target_speed_B = 0.3f;
+volatile float target_speed_C = 0.3f;
+volatile float target_speed_D = 0.3f;
 
-/* PID输出，范围-100～100 */
-volatile float base_pwm = 0.0f;
+
 int main(void)
 {
     SYSCFG_DL_init();
@@ -30,11 +29,11 @@ int main(void)
     OLED_Init();
     // Ultrasonic_Init();
     BNO08X_Init();
-    PID_Init((&speed_pid), 10.0, 10.0, 0.0, 100, -100);
+    
     /* Don't remove this! */
     Interrupt_Init();   
     motor_init();
-     //DL_UART_Main_enableInterrupt(UART_DEBUG_INST, DL_UART_MAIN_INTERRUPT_RX);
+    //DL_UART_Main_enableInterrupt(UART_DEBUG_INST, DL_UART_MAIN_INTERRUPT_RX);
     NVIC_ClearPendingIRQ(UART_DEBUG_INST_INT_IRQN);
     NVIC_EnableIRQ(UART_DEBUG_INST_INT_IRQN);
     //  NVIC_EnableIRQ(ENCODERA_INT_IRQN );
@@ -46,18 +45,26 @@ int main(void)
     NVIC_EnableIRQ(TIMER_0_INST_INT_IRQN );
     
     OLED_ShowString(0,7,(uint8_t *)"BNO08X Demo",8);
-    OLED_ShowString(0,1,(uint8_t *)"BNO08X Demo",8);
     
     
+    
+
+    PID_Init(&speed_pid_A, SPEED_KP, SPEED_KI, 0.0f, 100.0f, -100.0f);
+    PID_Init(&speed_pid_B, SPEED_KP, SPEED_KI, 0.0f, 100.0f, -100.0f);
+    PID_Init(&speed_pid_C, SPEED_KP, SPEED_KI, 0.0f, 100.0f, -100.0f);
+    PID_Init(&speed_pid_D, SPEED_KP, SPEED_KI, 0.0f, 100.0f, -100.0f);
     
     while (1) 
     {   
-        
+        sprintf((char *)oled_buffer, "%-6.3f  ", speed_A);
+        OLED_ShowString(0,0,oled_buffer,8);
+        sprintf((char *)oled_buffer, "%-6.3f  ", target_speed_A);
+        OLED_ShowString(0,6,oled_buffer,8);
         
          
         // OLED_ShowString(0, 6, (uint8_t *)Serial_RxString, 8);
-        // // Motor_SetPWM(1,25);
-        // sudu=speed_A ;
+       
+        
         // sprintf((char *)oled_buffer, "%-6.3f  ", sudu);
         // OLED_ShowString(6,6,oled_buffer,8);
         // sprintf((char *)oled_buffer, "Kp:%-6.2f     ", sudu0.Kp);
@@ -135,15 +142,16 @@ void TIMER_0_INST_IRQHandler()
            
                 
             
-            Encoder_Update();
-            //base_pwm=pid.out
-            average_speed = (speed_A + speed_B + speed_C + speed_D) / 4.0f;
-            base_pwm= PID_Positional_Update(&speed_pid,average_speed,target_speed);
-            // DL_GPIO_togglePins(LED_PORT ,LED_PIN_0_PIN);
-            Motor_SetPWM(1, (int8_t) base_pwm);
-            Motor_SetPWM(2, (int8_t) base_pwm);
-            Motor_SetPWM(3, (int8_t) base_pwm);
-            Motor_SetPWM(4, (int8_t) base_pwm);
+            Encoder_Update();                                //实际值，目标值
+            float pwm_A = PID_Positional_Update(&speed_pid_A, speed_A, target_speed_A);
+            float pwm_B = PID_Positional_Update(&speed_pid_B, speed_B, target_speed_B);
+            float pwm_C = PID_Positional_Update(&speed_pid_C, speed_C, target_speed_C);
+            float pwm_D = PID_Positional_Update(&speed_pid_D, speed_D, target_speed_D);
+            Motor_SetPWM(1, (int8_t)pwm_A);
+            Motor_SetPWM(2, (int8_t)pwm_B);
+            Motor_SetPWM(3, (int8_t)pwm_C);
+            Motor_SetPWM(4, (int8_t)pwm_D);
+            
             break;
            }
         default:

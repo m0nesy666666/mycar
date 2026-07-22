@@ -9,7 +9,7 @@ void PID_Init(PID_t *p, float kp, float ki, float kd, float out_max, float out_m
     p->OutMax = out_max;
     p->OutMin = out_min;
 
-    
+    p->ErrorIntMax = 20.0f;
 
     // 清零动态变量
     p->Target   = 0.0f;
@@ -20,6 +20,8 @@ void PID_Init(PID_t *p, float kp, float ki, float kd, float out_max, float out_m
     p->Error2   = 0.0f;
     p->ErrorInt = 0.0f;
 }
+
+
 
 float PID_Positional_Update(PID_t *p, float actual, float target)
 {
