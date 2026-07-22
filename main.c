@@ -9,7 +9,7 @@ PID_t speed_pid_A;
 PID_t speed_pid_B;
 PID_t speed_pid_C;
 PID_t speed_pid_D;
-#define SPEED_KP  8.0f
+#define SPEED_KP  18.0f
 #define SPEED_KI  0.5f
 uint8_t oled_buffer[32];
 int status = 0;
@@ -19,7 +19,10 @@ volatile float target_speed_B = 0.3f;
 volatile float target_speed_C = 0.3f;
 volatile float target_speed_D = 0.3f;
 
-
+volatile float pwm_A;
+volatile float pwm_B;
+volatile float pwm_C;
+volatile float pwm_D;
 int main(void)
 {
     SYSCFG_DL_init();
@@ -44,7 +47,12 @@ int main(void)
     NVIC_ClearPendingIRQ(TIMER_0_INST_INT_IRQN);
     NVIC_EnableIRQ(TIMER_0_INST_INT_IRQN );
     
-    OLED_ShowString(0,7,(uint8_t *)"BNO08X Demo",8);
+    OLED_ShowString(0,0,(uint8_t *)"speed_A=",8);
+    OLED_ShowString(0,2,(uint8_t *)"target_A=",8);
+    OLED_ShowString(0,4,(uint8_t *)"SPEED_KP=",8);
+    OLED_ShowString(0,6,(uint8_t *)"SPEED_KI=",8);
+    OLED_ShowString(0,8,(uint8_t *)"pwm_A=",8);
+    OLED_ShowString(0,10,(uint8_t *)"BNO08X Demo",8);
     
     
     
@@ -57,9 +65,15 @@ int main(void)
     while (1) 
     {   
         sprintf((char *)oled_buffer, "%-6.3f  ", speed_A);
-        OLED_ShowString(0,0,oled_buffer,8);
+        OLED_ShowString(80,0,oled_buffer,8);
         sprintf((char *)oled_buffer, "%-6.3f  ", target_speed_A);
-        OLED_ShowString(0,6,oled_buffer,8);
+        OLED_ShowString(80,2,oled_buffer,8);
+        sprintf((char *)oled_buffer, "%-6.3f  ", SPEED_KP);
+        OLED_ShowString(80,4,oled_buffer,8);
+        sprintf((char *)oled_buffer, "%-6.3f  ", SPEED_KI);
+        OLED_ShowString(80,6,oled_buffer,8);
+        sprintf((char *)oled_buffer, "%-6.3f  ",  pwm_A);
+        OLED_ShowString(80,8,oled_buffer,8);
         
          
         // OLED_ShowString(0, 6, (uint8_t *)Serial_RxString, 8);
@@ -143,10 +157,10 @@ void TIMER_0_INST_IRQHandler()
                 
             
             Encoder_Update();                                //实际值，目标值
-            float pwm_A = PID_Positional_Update(&speed_pid_A, speed_A, target_speed_A);
-            float pwm_B = PID_Positional_Update(&speed_pid_B, speed_B, target_speed_B);
-            float pwm_C = PID_Positional_Update(&speed_pid_C, speed_C, target_speed_C);
-            float pwm_D = PID_Positional_Update(&speed_pid_D, speed_D, target_speed_D);
+             pwm_A = PID_Positional_Update(&speed_pid_A, speed_A, target_speed_A);
+             pwm_B = PID_Positional_Update(&speed_pid_B, speed_B, target_speed_B);
+             pwm_C = PID_Positional_Update(&speed_pid_C, speed_C, target_speed_C);
+             pwm_D = PID_Positional_Update(&speed_pid_D, speed_D, target_speed_D);
             Motor_SetPWM(1, (int8_t)pwm_A);
             Motor_SetPWM(2, (int8_t)pwm_B);
             Motor_SetPWM(3, (int8_t)pwm_C);
