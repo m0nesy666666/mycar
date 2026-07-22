@@ -4,7 +4,7 @@
 //串口收发.hex数据包
 uint8_t Serial_TxPacket[4];				// 定义发送数据包数组，格式：FF 01 02 03 04 FE
 uint8_t Serial_RxPacket[4];				// 定义接收数据包数组
-uint8_t Serial_RxFlag;					// 定义接收数据包标志位
+volatile uint8_t Serial_RxFlag=0;					// 定义接收数据包标志位
 
 /**
   * 函    数：串口发送一个字节

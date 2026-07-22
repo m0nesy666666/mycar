@@ -7,7 +7,7 @@
 
 extern uint8_t Serial_TxPacket[4];
 extern uint8_t Serial_RxPacket[4];
-extern uint8_t Serial_RxFlag;
+extern volatile uint8_t Serial_RxFlag;
 extern char Serial_RxString[32];   
 
 void Serial_SendByte(uint8_t Byte);

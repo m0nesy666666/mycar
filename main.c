@@ -32,6 +32,10 @@ int main(void)
     OLED_Init();
     // Ultrasonic_Init();
     BNO08X_Init();
+    PID_Init(&speed_pid_A, SPEED_KP, SPEED_KI, 0.0f, 100.0f, -100.0f);
+    PID_Init(&speed_pid_B, SPEED_KP, SPEED_KI, 0.0f, 100.0f, -100.0f);
+    PID_Init(&speed_pid_C, SPEED_KP, SPEED_KI, 0.0f, 100.0f, -100.0f);
+    PID_Init(&speed_pid_D, SPEED_KP, SPEED_KI, 0.0f, 100.0f, -100.0f);
     
     /* Don't remove this! */
     Interrupt_Init();   
@@ -53,14 +57,11 @@ int main(void)
     OLED_ShowString(0,6,(uint8_t *)"SPEED_KI=",8);
     OLED_ShowString(0,8,(uint8_t *)"pwm_A=",8);
     OLED_ShowString(0,10,(uint8_t *)"BNO08X Demo",8);
-    
+    float temp_value = 0.0f;
     
     
 
-    PID_Init(&speed_pid_A, SPEED_KP, SPEED_KI, 0.0f, 100.0f, -100.0f);
-    PID_Init(&speed_pid_B, SPEED_KP, SPEED_KI, 0.0f, 100.0f, -100.0f);
-    PID_Init(&speed_pid_C, SPEED_KP, SPEED_KI, 0.0f, 100.0f, -100.0f);
-    PID_Init(&speed_pid_D, SPEED_KP, SPEED_KI, 0.0f, 100.0f, -100.0f);
+    
     
     while (1) 
     {   
@@ -68,14 +69,44 @@ int main(void)
         OLED_ShowString(80,0,oled_buffer,8);
         sprintf((char *)oled_buffer, "%-6.3f  ", target_speed_A);
         OLED_ShowString(80,2,oled_buffer,8);
-        sprintf((char *)oled_buffer, "%-6.3f  ", SPEED_KP);
+        sprintf((char *)oled_buffer, "%-6.3f  ", speed_pid_A.Kp);
         OLED_ShowString(80,4,oled_buffer,8);
-        sprintf((char *)oled_buffer, "%-6.3f  ", SPEED_KI);
+        sprintf((char *)oled_buffer, "%-6.3f  ", speed_pid_A.Ki);
         OLED_ShowString(80,6,oled_buffer,8);
         sprintf((char *)oled_buffer, "%-6.3f  ",  pwm_A);
         OLED_ShowString(80,8,oled_buffer,8);
         
-         
+        if(Serial_GetRxFlag())
+        {
+             /* 只在收到新命令时更新这一行 */
+            sprintf((char *)oled_buffer,"RX:%-12.12s",Serial_RxString);
+
+            OLED_ShowString(0, 10, oled_buffer, 8);
+                   
+            /* 调A轮Kp，例如收到 P:30.0 */
+            if(sscanf(Serial_RxString, "P:%f", &temp_value) == 1)
+            {
+                speed_pid_A.Kp = temp_value;
+            }
+
+            /* 调A轮Ki，例如收到 I:0.20 */
+            else if(sscanf(Serial_RxString, "I:%f", &temp_value) == 1)
+                {
+                    speed_pid_A.Ki = temp_value;
+                    /* 修改Ki后，重新开始积分测试 */
+                    speed_pid_A.ErrorInt = 0.0f;
+                }
+
+            /* 调A轮目标速度，例如收到 T:0.30 */
+            else if(sscanf(Serial_RxString, "T:%f", &temp_value) == 1)
+            {
+                target_speed_A = temp_value;
+
+                /* 目标速度变化后重新积分 */
+                speed_pid_A.ErrorInt = 0.0f;            }
+        }
+         /* 给VOFA发送A轮曲线 */
+        Serial_Printf("%.3f,%.3f,%.1f\r\n",speed_A,target_speed_A,pwm_A);
         // OLED_ShowString(0, 6, (uint8_t *)Serial_RxString, 8);
        
         
