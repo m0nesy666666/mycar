@@ -46,7 +46,7 @@
 //     return 0;
 // }
 
-// float weight[8] = {-8.0f,-6.0f,-3.0f,-1.0f,1.0f,3.0f,6.0f,8.0f};//越靠外侧误差增长越大
+// float weight[8] = {-7.0f,-5.0f,-3.0f,-1.0f,1.0f,3.0f,5.0f,7.0f};//越靠外侧误差增长越大
 
 // //计算误差
 // float GetLineError(void)

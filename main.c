@@ -14,7 +14,7 @@ PID_t speed_pid_D;
 uint8_t oled_buffer[32];
 int status = 0;
 
-volatile float target_speed_A = 0.3f;
+volatile float target_speed_A = 0.5f;//2.5才转
 volatile float target_speed_B = 0.3f;
 volatile float target_speed_C = 0.3f;
 volatile float target_speed_D = 0.3f;
@@ -152,7 +152,7 @@ int main(void)
         //     {
         //         target = temp_target;
 
-                
+
         //         sudu0.Error0 = 0.0f;
         //         sudu0.Error1 = 0.0f;
         //         sudu0.Error2 = 0.0f;
@@ -183,20 +183,20 @@ void TIMER_0_INST_IRQHandler()
             
             
                
-            DL_GPIO_togglePins(LED_PORT, LED_PIN_0_PIN);
+            // DL_GPIO_togglePins(LED_PORT, LED_PIN_0_PIN);
            
                 
             
             Encoder_Update();                                //实际值，目标值
-             pwm_A = PID_Positional_Update(&speed_pid_A, speed_A, target_speed_A);
-             pwm_B = PID_Positional_Update(&speed_pid_B, speed_B, target_speed_B);
-             pwm_C = PID_Positional_Update(&speed_pid_C, speed_C, target_speed_C);
-             pwm_D = PID_Positional_Update(&speed_pid_D, speed_D, target_speed_D);
+            pwm_A = PID_Positional_Update(&speed_pid_A, speed_A, target_speed_A);
+            pwm_B = PID_Positional_Update(&speed_pid_B, speed_B, target_speed_B);
+            pwm_C = PID_Positional_Update(&speed_pid_C, speed_C, target_speed_C);
+            pwm_D = PID_Positional_Update(&speed_pid_D, speed_D, target_speed_D);
             Motor_SetPWM(1, (int8_t)pwm_A);
             Motor_SetPWM(2, (int8_t)pwm_B);
             Motor_SetPWM(3, (int8_t)pwm_C);
             Motor_SetPWM(4, (int8_t)pwm_D);
-            
+
             break;
            }
         default:
