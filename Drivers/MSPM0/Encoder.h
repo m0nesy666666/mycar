@@ -5,7 +5,7 @@
 #define PI                  3.1415926f
 #define WHEEL_DIAMETER_M    0.068f      // 轮子直径 68mm = 0.068m
 #define ENCODER_RESOLUTION  13.0f       // 编码器本身线数
-#define GEAR_RATIO          28.0f       // 减速比 1:28
+#define GEAR_RATIO          30.0f       // 减速比 1:28
 #define MULTIPLE            2.0f        // A/B两相信号上升沿计数，等效2倍频
 
 // 轮子转一圈的总脉冲数 = 13 * 28 * 2 = 728

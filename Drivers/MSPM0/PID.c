@@ -78,20 +78,3 @@ float PID_Incremental_Update(PID_t *p, float actual, float target)
 
     return p->Out;
 }
-// PID_t motorPID;
-
-// void main(void)
-// {
-//     // 初始化：Kp=2.5, Ki=0.1, Kd=0.05, 输出限幅 0~1000
-//     PID_Init(&motorPID, 2.5f, 0.1f, 0.05f, 1000.0f, 0.0f);
-
-//     while(1)
-//     {
-//         float currentSpeed = getMotorSpeed();
-//         float targetSpeed  = 300.0f;
-
-//         float output = PID_Positional_Update(&motorPID, currentSpeed, targetSpeed);
-//         setMotorPWM(output);
-//         delay(10);
-//     }
-// }

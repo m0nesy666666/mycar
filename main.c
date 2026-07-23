@@ -5,24 +5,40 @@
 #include "motor.h"
 #include "Serial.h"
 #include <stdio.h>
+
 PID_t speed_pid_A;
 PID_t speed_pid_B;
 PID_t speed_pid_C;
 PID_t speed_pid_D;
-#define SPEED_KP  18.0f
-#define SPEED_KI  0.5f
+#define SPEED_KP  386.0f
+#define SPEED_KI  11.1f
 uint8_t oled_buffer[32];
 int status = 0;
 
-volatile float target_speed_A = 0.5f;//2.5才转
-volatile float target_speed_B = 0.3f;
-volatile float target_speed_C = 0.3f;
-volatile float target_speed_D = 0.3f;
+/*
+100-1.23m/s
+80-0.794m/s
+70-0.52m/s
+60-0.23m/s
+50-不转
+*/
+
+volatile float target_speed_A = 0.16f;
+volatile float target_speed_B = 0.16f;
+volatile float target_speed_C = 0.16f;
+volatile float target_speed_D = 0.16f;
 
 volatile float pwm_A;
 volatile float pwm_B;
 volatile float pwm_C;
 volatile float pwm_D;
+
+static void Debug_SendData(void)
+{
+    /* 给VOFA发送A轮曲线 */
+    Serial_Printf("%.3f,%.3f,%.1f\r\n", speed_A, target_speed_A, pwm_A);
+}
+
 int main(void)
 {
     SYSCFG_DL_init();
@@ -32,6 +48,7 @@ int main(void)
     OLED_Init();
     // Ultrasonic_Init();
     BNO08X_Init();
+    motor_init();
     PID_Init(&speed_pid_A, SPEED_KP, SPEED_KI, 0.0f, 100.0f, -100.0f);
     PID_Init(&speed_pid_B, SPEED_KP, SPEED_KI, 0.0f, 100.0f, -100.0f);
     PID_Init(&speed_pid_C, SPEED_KP, SPEED_KI, 0.0f, 100.0f, -100.0f);
@@ -58,13 +75,12 @@ int main(void)
     OLED_ShowString(0,8,(uint8_t *)"pwm_A=",8);
     OLED_ShowString(0,10,(uint8_t *)"BNO08X Demo",8);
     float temp_value = 0.0f;
-    
-    
 
-    
-    
+
     while (1) 
     {   
+        Debug_SendData();
+
         sprintf((char *)oled_buffer, "%-6.3f  ", speed_A);
         OLED_ShowString(80,0,oled_buffer,8);
         sprintf((char *)oled_buffer, "%-6.3f  ", target_speed_A);
@@ -75,14 +91,13 @@ int main(void)
         OLED_ShowString(80,6,oled_buffer,8);
         sprintf((char *)oled_buffer, "%-6.3f  ",  pwm_A);
         OLED_ShowString(80,8,oled_buffer,8);
-        
         if(Serial_GetRxFlag())
         {
              /* 只在收到新命令时更新这一行 */
             sprintf((char *)oled_buffer,"RX:%-12.12s",Serial_RxString);
 
             OLED_ShowString(0, 10, oled_buffer, 8);
-                   
+
             /* 调A轮Kp，例如收到 P:30.0 */
             if(sscanf(Serial_RxString, "P:%f", &temp_value) == 1)
             {
@@ -105,10 +120,8 @@ int main(void)
                 /* 目标速度变化后重新积分 */
                 speed_pid_A.ErrorInt = 0.0f;            }
         }
-         /* 给VOFA发送A轮曲线 */
-        Serial_Printf("%.3f,%.3f,%.1f\r\n",speed_A,target_speed_A,pwm_A);
         // OLED_ShowString(0, 6, (uint8_t *)Serial_RxString, 8);
-       
+
         
         // sprintf((char *)oled_buffer, "%-6.3f  ", sudu);
         // OLED_ShowString(6,6,oled_buffer,8);
@@ -186,8 +199,11 @@ void TIMER_0_INST_IRQHandler()
             // DL_GPIO_togglePins(LED_PORT, LED_PIN_0_PIN);
            
                 
-            
+            //更新速度
             Encoder_Update();                                //实际值，目标值
+
+
+
             pwm_A = PID_Positional_Update(&speed_pid_A, speed_A, target_speed_A);
             pwm_B = PID_Positional_Update(&speed_pid_B, speed_B, target_speed_B);
             pwm_C = PID_Positional_Update(&speed_pid_C, speed_C, target_speed_C);

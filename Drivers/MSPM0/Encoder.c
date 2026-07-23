@@ -48,7 +48,7 @@ void Encoder_Update(void)
     speed_A = (encoderA_cnt * (PI * WHEEL_DIAMETER_M / PULSE_PER_TURN)) * 50.0f;
     speed_B = (encoderB_cnt * (PI * WHEEL_DIAMETER_M / PULSE_PER_TURN)) * 50.0f;
     speed_C = (encoderC_cnt * (PI * WHEEL_DIAMETER_M / PULSE_PER_TURN)) * 50.0f;
-    speed_D = (encoderD_cnt * (PI * WHEEL_DIAMETER_M / PULSE_PER_TURN)) * 50.0f;
+    speed_D = -(encoderD_cnt * (PI * WHEEL_DIAMETER_M / PULSE_PER_TURN)) * 50.0f;
 }
 
 // ================== 外部中断服务函数 (脉冲计数) ==================

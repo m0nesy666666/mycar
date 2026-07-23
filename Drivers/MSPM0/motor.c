@@ -70,14 +70,15 @@ void Motor_SetPWM(uint8_t n, int8_t PWM)
 	{
 		if (PWM >= 0)
 		{
-            DL_GPIO_setPins(DC_MOTOR_BIN1_PORT,DC_MOTOR_BIN1_PIN);
-            DL_GPIO_clearPins(DC_MOTOR_BIN2_PORT, DC_MOTOR_BIN2_PIN);
+            DL_GPIO_setPins(DC_MOTOR_BIN2_PORT, DC_MOTOR_BIN2_PIN);
+            DL_GPIO_clearPins(DC_MOTOR_BIN1_PORT,DC_MOTOR_BIN1_PIN);
 			PWM_SetCompare1(PWM);
 		}
 		else
 		{			
-            DL_GPIO_setPins(DC_MOTOR_BIN2_PORT, DC_MOTOR_BIN2_PIN);
-            DL_GPIO_clearPins(DC_MOTOR_BIN1_PORT,DC_MOTOR_BIN1_PIN);
+            DL_GPIO_setPins(DC_MOTOR_BIN1_PORT,DC_MOTOR_BIN1_PIN);
+            DL_GPIO_clearPins(DC_MOTOR_BIN2_PORT, DC_MOTOR_BIN2_PIN);
+
 			PWM_SetCompare1(-PWM);
 		}
 	}
